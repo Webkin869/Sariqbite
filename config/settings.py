@@ -121,8 +121,8 @@ if DATABASE_URL:
     }
 else:
     if IS_VERCEL:
-        raise RuntimeError("DATABASE_URL Vercel environment variables ichida yo'q. Postgres ulang.")
-    
+        raise RuntimeError("Vercel'da DATABASE_URL yo'q. Neon Postgres connect qilinmagan.")
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
