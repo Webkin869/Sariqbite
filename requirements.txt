@@ -1,6 +1,7 @@
 Django==5.2.14
+django-jazzmin
 dj-database-url
+python-dotenv
 whitenoise
 psycopg[binary]
-python-dotenv
 Pillow
