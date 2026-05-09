@@ -110,6 +110,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 DATABASE_URL = os.getenv("DATABASE_URL")
+
 if DATABASE_URL:
     DATABASES = {
         "default": dj_database_url.parse(
@@ -119,6 +120,9 @@ if DATABASE_URL:
         )
     }
 else:
+    if IS_VERCEL:
+        raise RuntimeError("DATABASE_URL Vercel environment variables ichida yo'q. Postgres ulang.")
+    
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
