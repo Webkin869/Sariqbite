@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% block title %}SariqBite Studio{% endblock %}
+{% block content %}
+<section class="showcase section-lg">
+  <div class="container showcase-grid">
+    <div class="showcase-main panel surface-yellow">
+      <div class="row wrap gap-12 center">
+        <span class="eyebrow">Digital menu</span>
+        <span class="tiny-badge">Yellow concept</span>
+      </div>
+      <h1>Oddiy food site emas. Bu — buyurtma beriladigan menu board.</h1>
+      <p class="lead">Taomlarni ko'rish, delivery narxini hisoblash, tez savat tuzish va buyurtmani tracking qilish bitta oqimda ishlaydi.</p>
+      <div class="cta-row">
+        <a href="/menu/" class="btn btn-dark">Menu board ochish</a>
+        <a href="/orders/checkout/" class="btn btn-soft">Tez checkout</a>
+      </div>
+      <div class="ladder-grid">
+        <div class="ladder-card accent-1"><strong>1-bosqich</strong><span>0–2 km</span><b>8 000 so'm</b></div>
+        <div class="ladder-card accent-2"><strong>2-bosqich</strong><span>2–5 km</span><b>+2 000/km</b></div>
+        <div class="ladder-card accent-3"><strong>3-bosqich</strong><span>5–8 km</span><b>+3 500/km</b></div>
+        <div class="ladder-card accent-4"><strong>4-bosqich</strong><span>8+ km</span><b>+5 000/km</b></div>
+      </div>
+    </div>
+
+    <div class="showcase-side stack-16">
+      <div class="panel delivery-panel">
+        <div class="panel-head row between center">
+          <div>
+            <span class="eyebrow">Delivery panel</span>
+            <h3>Narxni shu yerda bilasiz</h3>
+          </div>
+          <span class="status-dot">live</span>
+        </div>
+        <label for="distance_km">Masofa (km)</label>
+        <input id="distance_km" type="number" min="0" step="0.1" value="4.5">
+        <div class="row gap-12 wrap">
+          <button id="quoteBtn" class="btn btn-primary grow">Hisoblash</button>
+          <button id="geoBtn" class="btn btn-soft grow">Lokatsiyamdan</button>
+        </div>
+        <div id="quoteResult" class="quote-box quote-box-strong"></div>
+      </div>
+
+      <div class="panel mini-stats">
+        <div class="stat-line"><span>Top mahsulotlar</span><strong>{{ featured_products|length }}</strong></div>
+        <div class="stat-line"><span>Kategoriyalar</span><strong>{{ categories|length }}</strong></div>
+        <div class="stat-line"><span>Default ETA</span><strong>25–40 min</strong></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="container section-lg">
+  <div class="section-bar row between center wrap gap-12">
+    <div>
+      <span class="eyebrow">Category rail</span>
+      <h2>Bir xil kartalar emas, menu ticket uslubi</h2>
+    </div>
+    <a href="/menu/" class="text-link">To'liq menu →</a>
+  </div>
+  <div class="ticket-grid">
+    {% for category in categories %}
+      <a class="ticket-card" href="/menu/?category={{ category.slug }}">
+        <span class="ticket-tag">{{ forloop.counter|stringformat:'02d' }}</span>
+        <strong>{{ category.name }}</strong>
+        <p>{{ category.description|default:'Taomlar guruhi' }}</p>
+        <span class="ticket-link">Ochish</span>
+      </a>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container section-lg">
+  <div class="section-bar row between center wrap gap-12">
+    <div>
+      <span class="eyebrow">Showcase foods</span>
+      <h2>Mahsulotlar endi katalog emas, showcase bloklarda</h2>
+    </div>
+  </div>
+
+  <div class="show-food-grid">
+    {% for product in featured_products %}
+      {% if forloop.first %}
+      <article class="food-feature" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.65)), url('{{ product.image_url }}')">
+        <div class="feature-copy">
+          <span class="tiny-badge">Featured</span>
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description|truncatechars:120 }}</p>
+          <div class="row between center wrap gap-12">
+            <strong>{{ product.price }} so'm</strong>
+            <a href="{{ product.get_absolute_url }}" class="btn btn-light">Ko'rish</a>
+          </div>
+        </div>
+      </article>
+      {% else %}
+      <article class="food-compact panel">
+        <div class="thumb" style="background-image:url('{{ product.image_url }}')"></div>
+        <div class="food-copy">
+          <div class="row between center gap-12">
+            <h3>{{ product.name }}</h3>
+            <span class="price-tag">{{ product.price }} so'm</span>
+          </div>
+          <p>{{ product.description|truncatechars:88 }}</p>
+          <div class="row between center gap-12">
+            <span class="meta-note">{{ product.prep_minutes }} min</span>
+            <a href="{{ product.get_absolute_url }}" class="text-link">Tanlash →</a>
+          </div>
+        </div>
+      </article>
+      {% endif %}
+    {% endfor %}
+  </div>
+</section>
+
+<section class="container section-lg">
+  <div class="insight-strip">
+    <div class="insight-card"><strong>Quick reorder</strong><span>Bir xil buyurtmalarni tez qaytarish uchun tayyor strukturada.</span></div>
+    <div class="insight-card"><strong>Power delivery</strong><span>Masofa, filial va ETA hisoblash allaqachon bor.</span></div>
+    <div class="insight-card"><strong>Bot-ready</strong><span>Sayt bot API bilan ishlash uchun tayyor qilingan.</span></div>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+async function renderQuote(url) {
+  const resultBox = document.getElementById('quoteResult');
+  resultBox.textContent = 'Hisoblanmoqda...';
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data.ok) {
+    resultBox.textContent = data.error || 'Xatolik';
+    return;
+  }
+  resultBox.innerHTML = `Masofa: <strong>${data.distance_km} km</strong><br>Yetkazib berish: <strong>${Number(data.delivery_fee).toLocaleString()} so'm</strong><br>ETA: <strong>${data.eta_minutes} daqiqa</strong>${data.branch ? `<br>Filial: <strong>${data.branch}</strong>` : ''}`;
+}
+document.getElementById('quoteBtn').addEventListener('click', () => {
+  const distance = document.getElementById('distance_km').value || '0';
+  renderQuote(`/orders/quote/?distance_km=${encodeURIComponent(distance)}`);
+});
+document.getElementById('geoBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    document.getElementById('quoteResult').textContent = 'Brauzer lokatsiyani qo\'llamaydi.';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition((pos) => {
+    renderQuote(`/orders/quote/?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}`);
+  }, () => {
+    document.getElementById('quoteResult').textContent = 'Lokatsiya olinmadi.';
+  });
+});
+</script>
+{% endblock %}

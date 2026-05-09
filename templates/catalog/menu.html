@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %}Menu board | SariqBite{% endblock %}
+{% block content %}
+<section class="container section-lg">
+  <div class="menu-board">
+    <aside class="menu-sidebar panel">
+      <span class="eyebrow">Menu board</span>
+      <h1>{% if active_category %}{{ active_category.name }}{% else %}Barcha taomlar{% endif %}</h1>
+      <p class="lead">Bu sahifa klassik grid emas. Kategoriyalar chap tomonda, taomlar esa board ko'rinishida beriladi.</p>
+      <div class="sidebar-links">
+        <a class="side-link {% if not active_category %}active{% endif %}" href="/menu/">Hammasi</a>
+        {% for category in categories %}
+        <a class="side-link {% if active_category and active_category.id == category.id %}active{% endif %}" href="/menu/?category={{ category.slug }}">{{ category.name }}</a>
+        {% endfor %}
+      </div>
+    </aside>
+
+    <div class="menu-content">
+      <div class="menu-toolbar panel row between center wrap gap-12">
+        <div>
+          <strong>{{ products|length }} ta mahsulot</strong>
+          <p class="muted">Narx, tayyorlanish va category bir ko'rishda ko'rinadi.</p>
+        </div>
+        <a href="/orders/cart/" class="btn btn-primary">Savatga o'tish</a>
+      </div>
+
+      <div class="board-list">
+        {% for product in products %}
+        <article class="board-item panel">
+          <div class="board-thumb" style="background-image:url('{{ product.image_url }}')"></div>
+          <div class="board-copy">
+            <div class="row between center wrap gap-12">
+              <div>
+                <span class="tiny-badge">{{ product.category.name }}</span>
+                <h3>{{ product.name }}</h3>
+              </div>
+              <strong class="price-tag large">{{ product.price }} so'm</strong>
+            </div>
+            <p>{{ product.description|truncatechars:120 }}</p>
+            <div class="board-meta row wrap gap-12 center">
+              <span class="meta-chip">{{ product.prep_minutes }} daqiqa</span>
+              <span class="meta-chip">Spice {{ product.spice_level }}/3</span>
+            </div>
+          </div>
+          <div class="board-action">
+            <a class="btn btn-dark full" href="{{ product.get_absolute_url }}">Tanlash</a>
+          </div>
+        </article>
+        {% empty %}
+          <div class="panel"><p>Mahsulot topilmadi.</p></div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

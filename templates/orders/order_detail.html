@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}Order #{{ order.id }} | SariqBite{% endblock %}
+{% block content %}
+<section class="container section-lg">
+  <div class="section-bar row between center wrap gap-12">
+    <div>
+      <span class="eyebrow">Tracking board</span>
+      <h1>Buyurtma #{{ order.id }}</h1>
+    </div>
+    <span class="tiny-badge">{{ order.get_status_display }}</span>
+  </div>
+
+  <div class="tracking-steps">
+    <div class="track-step {% if status_rank >= 1 %}active{% endif %}">Qabul qilindi</div>
+    <div class="track-step {% if status_rank >= 2 %}active{% endif %}">Tayyorlanmoqda</div>
+    <div class="track-step {% if status_rank >= 3 %}active{% endif %}">Yo'lda</div>
+    <div class="track-step {% if status_rank >= 4 %}active{% endif %}">Yetkazildi</div>
+  </div>
+
+  <div class="checkout-shell top-gap">
+    <div class="panel form-stack">
+      <div class="calc-line"><span>Status</span><strong>{{ order.get_status_display }}</strong></div>
+      <div class="calc-line"><span>To'lov</span><strong>{{ order.get_payment_method_display }}</strong></div>
+      <div class="calc-line"><span>Masofa</span><strong>{{ order.distance_km }} km</strong></div>
+      <div class="calc-line"><span>ETA</span><strong>{{ order.eta_minutes }} daqiqa</strong></div>
+      <div class="calc-line"><span>Filial</span><strong>{% if order.branch %}{{ order.branch.name }}{% else %}-{% endif %}</strong></div>
+      <div class="calc-line total"><span>Jami</span><strong>{{ order.total }} so'm</strong></div>
+    </div>
+    <aside class="panel checkout-summary">
+      <span class="eyebrow">Order items</span>
+      <h3>Tarkib</h3>
+      {% for item in order.items.all %}
+        <div class="calc-line"><span>{{ item.product_name }} x{{ item.quantity }}</span><strong>{{ item.line_total }} so'm</strong></div>
+      {% endfor %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

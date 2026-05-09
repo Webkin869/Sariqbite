@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}{{ product.name }} | SariqBite{% endblock %}
+{% block content %}
+<section class="container section-lg">
+  <div class="detail-shell">
+    <div class="detail-stage" style="background-image: linear-gradient(180deg, rgba(0,0,0,0.10), rgba(0,0,0,0.58)), url('{{ product.image_url }}')">
+      <div class="detail-overlay">
+        <span class="tiny-badge">{{ product.category.name }}</span>
+        <h1>{{ product.name }}</h1>
+        <p>{{ product.description }}</p>
+        <div class="detail-stat-row">
+          <div class="detail-stat"><span>Narx</span><strong>{{ product.price }} so'm</strong></div>
+          <div class="detail-stat"><span>Prep</span><strong>{{ product.prep_minutes }} min</strong></div>
+          <div class="detail-stat"><span>Spice</span><strong>{{ product.spice_level }}/3</strong></div>
+        </div>
+      </div>
+    </div>
+
+    <aside class="detail-order panel sticky-panel">
+      <span class="eyebrow">Build your order</span>
+      <h3>Buyurtma paneli</h3>
+      <form method="post" action="/orders/cart/add/" class="form-stack">
+        {% csrf_token %}
+        <input type="hidden" name="product_id" value="{{ product.id }}">
+        <label>Miqdor</label>
+        <input type="number" name="quantity" min="1" value="1">
+        {% if product.options.all %}
+          <label>Qo'shimchalar</label>
+          <div class="option-stack">
+            {% for opt in product.options.all %}
+            {% if opt.is_active %}
+            <label class="option-tile">
+              <input type="checkbox" name="option_ids" value="{{ opt.id }}">
+              <span>{{ opt.name }}</span>
+              <strong>+{{ opt.extra_price }} so'm</strong>
+            </label>
+            {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        <button class="btn btn-primary">Savatga qo'shish</button>
+        <a href="/menu/" class="btn btn-soft">Menu ga qaytish</a>
+      </form>
+    </aside>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SariqBite Studio{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'css/site.css' %}">
+</head>
+<body>
+  <div class="notice-bar">
+    <div class="container notice-wrap">
+      <span>🛵 Live delivery panel</span>
+      <span>Masofaga qarab narx o'zgaradi</span>
+      <span>Issiq ovqatlar • tez buyurtma • kuchli tracking</span>
+    </div>
+  </div>
+
+  <header class="site-header">
+    <div class="container shell between center wrap gap-16">
+      <a class="brandmark" href="/">
+        <span class="brand-icon">SB</span>
+        <span>
+          <strong>SariqBite</strong>
+          <small>menu & delivery studio</small>
+        </span>
+      </a>
+      <nav class="main-nav">
+        <a href="/">Bosh sahifa</a>
+        <a href="/menu/">Menu board</a>
+        <a href="/orders/cart/">Savat <span class="nav-pill">{{ cart_summary.count }}</span></a>
+      </nav>
+    </div>
+  </header>
+
+  {% if messages %}
+  <section class="container flash-stack">
+    {% for message in messages %}
+      <div class="flash {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </section>
+  {% endif %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-card footer-brand">
+        <span class="eyebrow">SariqBite Studio</span>
+        <h3>Menyu kabi ko'rinadigan, dashboard kabi ishlaydigan food site.</h3>
+        <p>Bu versiyada sayt klassik restoran katalogidan chiqib, delivery control panel uslubiga o'tkazildi.</p>
+      </div>
+      <div class="footer-card">
+        <h4>Delivery ladder</h4>
+        <ul class="plain-list">
+          <li>0–2 km → bazaviy</li>
+          <li>2–5 km → +2 000/km</li>
+          <li>5–8 km → +3 500/km</li>
+          <li>8+ km → +5 000/km</li>
+        </ul>
+      </div>
+      <div class="footer-card">
+        <h4>Fast links</h4>
+        <ul class="plain-list">
+          <li><a href="/menu/">Menu board</a></li>
+          <li><a href="/orders/cart/">Cart</a></li>
+          <li><a href="/orders/checkout/">Checkout</a></li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

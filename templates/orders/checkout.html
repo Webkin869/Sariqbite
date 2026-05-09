@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% block title %}Checkout | SariqBite{% endblock %}
+{% block content %}
+<section class="container section-lg">
+  <div class="section-bar row between center wrap gap-12">
+    <div>
+      <span class="eyebrow">Checkout control</span>
+      <h1>Buyurtmani yakunlash paneli</h1>
+    </div>
+  </div>
+
+  <div class="checkout-shell">
+    <form method="post" class="panel form-stack" id="checkoutForm">
+      {% csrf_token %}
+      <div class="row wrap gap-12">
+        <div class="grow field-block">
+          <label>Ism</label>
+          {{ form.full_name }}
+        </div>
+        <div class="grow field-block">
+          <label>Telefon</label>
+          {{ form.phone }}
+        </div>
+      </div>
+      <label>Manzil</label>
+      {{ form.address }}
+      <label>Izoh</label>
+      {{ form.note }}
+      <div class="row wrap gap-12">
+        <div class="grow field-block">
+          <label>To'lov turi</label>
+          {{ form.payment_method }}
+        </div>
+        <div class="grow field-block">
+          <label>Masofa (km) — manual fallback</label>
+          {{ form.distance_km }}
+        </div>
+      </div>
+      {{ form.latitude }}
+      {{ form.longitude }}
+      <div class="row gap-12 wrap">
+        <button type="button" class="btn btn-soft" id="geoCheckoutBtn">Lokatsiyamdan hisobla</button>
+        <button type="button" class="btn btn-primary" id="manualQuoteBtn">Narxni hisobla</button>
+      </div>
+      <div id="checkoutQuote" class="quote-box"></div>
+      <button class="btn btn-dark">Buyurtmani yuborish</button>
+    </form>
+
+    <aside class="panel checkout-summary sticky-panel">
+      <span class="eyebrow">Order preview</span>
+      <h3>Savat tarkibi</h3>
+      <div class="stack-12">
+        {% for item in cart.items %}
+          <div class="calc-line"><span>{{ item.name }} x{{ item.quantity }}</span><strong>{{ item.line_total }} so'm</strong></div>
+        {% endfor %}
+      </div>
+      <div class="calc-line total top-gap"><span>Subtotal</span><strong>{{ cart.subtotal }} so'm</strong></div>
+      <p class="muted">Lokatsiya yuborilsa nearest branch va ETA aniqroq qaytadi.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+{% block scripts %}
+<script>
+async function checkoutQuote(url) {
+  const box = document.getElementById('checkoutQuote');
+  box.textContent = 'Hisoblanmoqda...';
+  const res = await fetch(url);
+  const data = await res.json();
+  if (!data.ok) {
+    box.textContent = data.error || 'Xatolik';
+    return;
+  }
+  box.innerHTML = `Masofa: <strong>${data.distance_km} km</strong><br>Delivery: <strong>${Number(data.delivery_fee).toLocaleString()} so'm</strong><br>ETA: <strong>${data.eta_minutes} daqiqa</strong>${data.branch ? `<br>Filial: <strong>${data.branch}</strong>` : ''}`;
+  document.getElementById('id_distance_km').value = data.distance_km;
+}
+document.getElementById('manualQuoteBtn').addEventListener('click', () => {
+  const distance = document.getElementById('id_distance_km').value || '0';
+  checkoutQuote(`/orders/quote/?distance_km=${encodeURIComponent(distance)}`);
+});
+document.getElementById('geoCheckoutBtn').addEventListener('click', () => {
+  if (!navigator.geolocation) {
+    document.getElementById('checkoutQuote').textContent = 'Brauzer lokatsiyani qo\'llamaydi.';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition((pos) => {
+    document.getElementById('id_latitude').value = pos.coords.latitude;
+    document.getElementById('id_longitude').value = pos.coords.longitude;
+    checkoutQuote(`/orders/quote/?latitude=${pos.coords.latitude}&longitude=${pos.coords.longitude}`);
+  }, () => {
+    document.getElementById('checkoutQuote').textContent = 'Lokatsiya olinmadi.';
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Savat | SariqBite{% endblock %}
+{% block content %}
+<section class="container section-lg">
+  <div class="section-bar row between center wrap gap-12">
+    <div>
+      <span class="eyebrow">Cart board</span>
+      <h1>Savat dashboard</h1>
+    </div>
+    <a class="btn btn-soft" href="/menu/">Yana mahsulot qo'shish</a>
+  </div>
+
+  <div class="cart-board">
+    <div class="stack-16">
+      {% for item in cart.items %}
+      <article class="cart-board-item panel">
+        <div class="cart-main">
+          <div>
+            <h3>{{ item.name }}</h3>
+            {% if item.options %}
+              <p>{% for opt in item.options %}{{ opt.name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            {% endif %}
+            <strong class="price-tag">{{ item.line_total }} so'm</strong>
+          </div>
+        </div>
+        <form method="post" action="/orders/cart/{{ item.key }}/change/" class="cart-actions">
+          {% csrf_token %}
+          <input type="number" name="quantity" min="1" value="{{ item.quantity }}">
+          <button class="btn btn-primary">Yangilash</button>
+          <button class="btn btn-danger" name="action" value="remove">O'chirish</button>
+        </form>
+      </article>
+      {% empty %}
+      <div class="panel"><p>Savat bo'sh.</p></div>
+      {% endfor %}
+    </div>
+
+    <aside class="summary-panel panel sticky-panel">
+      <span class="eyebrow">Totals</span>
+      <h3>Buyurtma hisobi</h3>
+      <div class="calc-line"><span>Subtotal</span><strong>{{ cart.subtotal }} so'm</strong></div>
+      <div class="calc-line"><span>Default delivery</span><strong>{{ delivery_quote.delivery_fee }} so'm</strong></div>
+      <div class="calc-line total"><span>Jami</span><strong>{{ grand_total }} so'm</strong></div>
+      <p class="muted">Checkoutda lokatsiya bo'yicha real delivery qayta hisoblanadi.</p>
+      <a class="btn btn-dark full" href="/orders/checkout/">Checkout</a>
+    </aside>
+  </div>
+</section>
+{% endblock %}
